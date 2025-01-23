@@ -6,6 +6,7 @@ Vertix.io is a beloved multiplayer 2D shooter that captured the hearts of player
 ## Our Goal
 The goal of the Vertix.io Revival Project is to bring the game back to life and make it accessible across multiple platforms, ensuring that both old and new players can enjoy the classic experience once again. We aim to modernize the backend infrastructure while preserving the core gameplay mechanics that made Vertix.io so special.
 
+<<<<<<< HEAD
 Here's the new section to add under **Phase 3: Public Release**:
 
 ### Map Editor  
@@ -39,6 +40,8 @@ To empower players and foster creativity, we’ve developed an **advanced in-bro
 
 This tool will ship with the **open-source release**, allowing modders to expand its functionality or integrate new asset packs. Community maps will be featured in seasonal events and ranked playlists, ensuring fresh content driven by players!
 
+=======
+>>>>>>> origin/main
 ## Roadmap
 
 ### Phase 1: Foundation
@@ -81,4 +84,9 @@ This tool will ship with the **open-source release**, allowing modders to expand
 ## How You Can Help
 We are actively seeking contributors, testers, and passionate fans to help make this revival a success. If you're interested in contributing, please reach out through our community channels.
 
+<<<<<<< HEAD
 Together, we can bring Vertix.io back and make it better than ever!
+=======
+Together, we can bring Vertix.io back and make it better than ever!
+
+>>>>>>> origin/main
