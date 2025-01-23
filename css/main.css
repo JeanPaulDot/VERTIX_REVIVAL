@@ -29,6 +29,22 @@ html, body {
     -ms-interpolation-mode: nearest-neighbor;
 }
 
+#customMapButton {
+    background: #27ae60;
+    margin: 10px 0;
+    width: 200px;
+    padding: 10px;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+#customMapButton:hover {
+    background: #219a52;
+}
+
 a {
 	text-decoration: none;
 }

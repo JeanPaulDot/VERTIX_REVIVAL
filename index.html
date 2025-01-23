@@ -14,7 +14,7 @@
 <script type="text/javascript" src="./js/lib/zip.js"></script>
 <script type="text/javascript" src="./js/lib/zip-fs.js"></script>
 <script type="text/javascript" src="./js/lib/zip-ext.js"></script>
-<script>
+<!--<script>
 		window.twttr = (function(d, s, id) {
 		  var js, fjs = d.getElementsByTagName(s)[0],
 		    t = window.twttr || {};
@@ -29,9 +29,9 @@
 		  };
 		  return t;
 		}(document, "script", "twitter-wjs"));
-	</script>
+	</script>-->
 </head>
-	<script async src="./utils/pagead2.googlesyndication.com/pagead/js/f.txt"></script>
+	<!--<script async src="./utils/pagead2.googlesyndication.com/pagead/js/f.txt"></script>-->
 	<div id="mobileMessage"></div>
 	<div id="gameAreaWrapper">
 		<div class="chatbox" id="chatbox">
@@ -119,18 +119,20 @@
 
 	<div id="startMenuWrapper">
 		<div id="mainTitleText">VERTIX ONLINE</div>
-		<div id="adWrapper">
+		<!--<div id="adWrapper">
 			<h3 class="menuHeader">ADS</h3>
-			<!-- MAIN MENU AD -->
+			MAIN MENU AD 
 			<ins class="adsbygoogle" style="display:inline-block;width:336px;height:280px" data-ad-client="ca-pub-6262474647613867" data-ad-slot="7766521348"></ins>
 			<script>
 				(adsbygoogle = window.adsbygoogle || []).push({});
 			</script>
-		</div>
+		</div>-->
 		<div id="startMenu">
 			<p class="menuHeader">MAIN MENU</p>
 			<input type="text" tabindex="0" autofocus placeholder="Player Name" id="playerNameInput" maxlength="15"/> <br/>
 			<button id="startButton">ENTER GAME</button>
+			<input type="file" id="mapFileInput" hidden accept=".json" />
+			<button id="customMapButton" onclick="document.getElementById('mapFileInput').click()">PLAY CUSTOM MAP</button>
 			<button id="leaderButton">LEADERBOARDS</button>
 			<button id="settingsButton">SETTINGS</button>
 			<div id="settings">
@@ -205,7 +207,7 @@
 					<div><b>Spray:</b><div id="sprayKeyCh" class="inputSelectItem" onclick="inputChange(this, 'sprayKey');">F</div></div>
 					<div><b>View Stats:</b><div id="leaderboardKeyCh" class="inputSelectItem" onclick="inputChange(this, 'leaderboardKey');">Shift</div></div>
 					<div><b>Toggle Chat:</b><div id="chatToggleKeyCh" class="inputSelectItem" onclick="inputChange(this, 'chatToggleKey');">Enter</div></div>
-					<br/> Check the <a href="https://web.archive.org/web/20230430171953/https://www.reddit.com/r/VertixOnline/wiki/index">Wiki</a> for more info.
+					<br/> Check the <a href="https://vertixio.fandom.com/wiki/Vertix.io_Wiki">Wiki</a> for more info.
 				</div>
 			</div>
 			<div style="width: 100%" id="socialContainer">
@@ -408,22 +410,13 @@
 			<div id="modTab" class="tabcontent">
 				<h3 class="menuHeaderTabbed2">LOAD MOD PACK</h3>
 				<div id="featuredModList">
-					<div class="modBtn" onclick="loadModPack('https://web.archive.org/web/20230430171953/http://vertixmods.xyz/mods/minecraft/vertixmod.zip', false)">Minecraft Mod Pack (6 mb)</div>
-					<div class="modBtn" onclick="loadModPack('https://web.archive.org/web/20230430171953/http://vertixmods.xyz/mods/pacman/vertixmod.zip', false)">Pacman Mod Pack (1 mb)</div>
-					<div class="modBtn" onclick="loadModPack('https://web.archive.org/web/20230430171953/http://vertixmods.xyz/mods/ruins/vertixmod.zip', false)">Undertale Ruins (4 mb)</div>
-					<div class="modBtn" onclick="loadModPack('https://web.archive.org/web/20230430171953/http://vertixmods.xyz/mods/snowdin/vertixmod.zip', false)">Undertale Snowdin (3 mb)</div>
-					<div class="modBtn" onclick="loadModPack('https://web.archive.org/web/20230430171953/http://vertixmods.xyz/mods/waterfalls/vertixmod.zip', false)">Undertale Waterfalls (1 mb)</div>
-					<div class="modBtn" onclick="loadModPack('https://web.archive.org/web/20230430171953/http://vertixmods.xyz/mods/grayscale/vertixmod.zip', false)">Black &amp; White Mod (4 mb)</div>
-					<div class="modBtn" onclick="loadModPack('https://web.archive.org/web/20230430171953/http://vertixmods.xyz/mods/water/vertixmod.zip', false)">Waterguns</div>
-					<div class="modBtn" onclick="loadModPack('https://web.archive.org/web/20230430171953/http://vertixmods.xyz/mods/mario/vertixmod.zip', false)">Mario Mod Pack (5 mb)</div>
-					<div class="modBtn" onclick="loadModPack('e3lib880qd7rjcl', false)">Nuclear Throne</div>
-					<div class="modBtn" onclick="loadModPack('13xlc5n3ipudqsn', false)">Sonic Mod Pack</div>
+
 				</div>
 				<div>
 					<input type="text" tabindex="0" autofocus placeholder="Mod Key/URL" id="textureModInput" class="menuTextInput"/>
 					<button id="texturePackButton" class="smallMenuButton">LOAD</button>
 				</div>
-				<b><a target="_blank" href="https://web.archive.org/web/20230430171953/https://www.reddit.com/r/VertixOnline/comments/4vypx9/texture_mods_please_post_all_texture_mods_here/">Get more mods here</a></b>
+				<b><a target="_blank" href="">Get more mods here</a></b>
 				<br/>
 				<div id="modInfo">
 				</div>
@@ -434,21 +427,21 @@
 		<center>
 			<div onclick="clickDropUpLink(1)" class="dropUpLink">MODS
 				<ul id="di1" class="dropdown">
-    				<li><a target="_blank" href="https://web.archive.org/web/20230430171953/https://www.reddit.com/r/VertixOnline/comments/43ol5a/texture_mods_please_post_all_texture_mods_here/">FIND A MOD</a></li>
-   					<li><a target="_blank" href="https://web.archive.org/web/20230430171953/https://www.reddit.com/r/VertixOnline/comments/444pzc/guide_how_to_make_a_mod/">MAKE A MOD</a></li>
+    				<li><a target="_blank" href="">FIND A MOD</a></li>
+   					<li><a target="_blank" href="">MAKE A MOD</a></li>
  		 		</ul>
 			</div> |
 			<div onclick="clickDropUpLink(2)" class="dropUpLink">COMMUNITY
 				<ul id="di2" class="dropdown">
     				<li><a target="_blank" href="#">FORUM</a></li>
    					<li><a target="_blank" href="#">FACEBOOK</a></li>
-   					<li><a target="_blank" href="#">DISCORD</a></li>
+   					<li><a target="_blank" href="https://discord.gg/hAw42YXYWT">DISCORD</a></li>
    					<li><a target="_blank" href="#">YOUTUBE</a></li>
  		 		</ul>
 			</div> |
 			<div onclick="clickDropUpLink(3)" class="dropUpLink">OTHER
 				<ul id="di3" class="dropdown">
-    				<li><a target="_blank" href="https://web.archive.org/web/20230430171953/https://www.reddit.com/r/VertixOnline/wiki/index">WIKI</a></li>
+    				<li><a target="_blank" href="https://vertixio.fandom.com/wiki/Vertix.io_Wiki">WIKI</a></li>
    					<li><a target="_blank" href="./terms.txt">TERMS OF USE</a></li>
    					<li><a target="_blank" href="./privacy.txt">PRIVACY POLICY</a></li>
     				<li><a target="_blank" href="./versions.txt">VERSION HISTORY</a></li>
@@ -468,8 +461,8 @@
 			</div> |
 			<div onclick="clickDropUpLink(5)" class="dropUpLink">SHARE
 				<ul id="di5" class="dropdown">
-					<li><a target="_blank" href="https://web.archive.org/web/20230430171953/http://www.facebook.com/sharer.php?u=http://vertix.io">FACEBOOK</a></li>
-   					<li><a target="_blank" href="https://web.archive.org/web/20230430171953/http://twitter.com/share?url=http://vertix.io&amp;text=Check%20out&amp;hashtags=vertix.io">TWITTER</a></li>
+					<li><a target="_blank" href="https://discord.gg/hAw42YXYWT">DISCORD</a></li>
+   					<li><a target="_blank" href="">TWITTER</a></li>
 				</ul>
 			</div>
 		</center>

@@ -1,20 +1,5 @@
-var _____WB$wombat$assign$function_____ = function (name) {
-  return (self._wb_wombat && self._wb_wombat.local_init && self._wb_wombat.local_init(name)) || self[name];
-};
-if (!self.__WB_pmw) {
-  self.__WB_pmw = function (obj) {
-      this.__WB_source = obj;
-      return this;
-  }
-} {
-  let window = _____WB$wombat$assign$function_____("window");
-  let self = _____WB$wombat$assign$function_____("self");
-  let document = _____WB$wombat$assign$function_____("document");
-  let location = _____WB$wombat$assign$function_____("location");
-  let top = _____WB$wombat$assign$function_____("top");
-  let parent = _____WB$wombat$assign$function_____("parent");
-  let frames = _____WB$wombat$assign$function_____("frames");
-  let opener = _____WB$wombat$assign$function_____("opener");
+  let customMapData = null;
+  let isCustomMap = false;
 
   var playerName, playerClassIndex, playerType, healthBarWidth, playerNameInput = document.getElementById("playerNameInput"),
       classInput = document.getElementById("classSelect"),
@@ -53,24 +38,70 @@ if (!self.__WB_pmw) {
       inMainMenu = !0,
       loggedIn = !1;
 
-  function startGame(a) {
-      startingGame || changingLobby || (startingGame = !0, playerName = playerNameInput.value.replace(/(<([^>]+)>)/ig, "").substring(0, 25), enterGame(a), inMainMenu && ($("#loadingWrapper").fadeIn(0, function () {}), document.getElementById("loadText").innerHTML = "CONNECTING"))
-  }
-  var devTest = !1;
 
-  function enterGame(a) {
-      startSoundTrack(2);
-      playerClassIndex = currentClassID;
-      playerType = a;
-      screenWidth = window.innerWidth;
-      screenHeight = window.innerHeight;
-      document.getElementById("startMenuWrapper").style.display = "none";
-      room || socket.emit("create");
-      socket.emit("respawn");
-      hideMenuUI();
-      animateOverlay = !0;
-      updateGameLoop()
-  }
+      function handleMapFile(file) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            try {
+                const mapData = JSON.parse(e.target.result);
+                if(validateMapData(mapData)) {
+                    customMapData = mapData;
+                    isCustomMap = true;
+                    startGame(true); // Start game with custom map flag
+                }
+            } catch(err) {
+                alert('Error loading map: ' + err.message);
+            }
+        };
+        reader.readAsText(file);
+    }
+
+
+    function startGame(a, isCustomMap = false) {
+        startingGame || changingLobby || (startingGame = true, 
+        playerName = playerNameInput.value.replace(/(<([^>]+)>)/ig, "").substring(0, 25), 
+        enterGame(a, isCustomMap), 
+        inMainMenu && ($("#loadingWrapper").fadeIn(0, function() {}), 
+        document.getElementById("loadText").innerHTML = "LOADING CUSTOM MAP")); // Changed message
+    }
+    
+    function enterGame(a, isCustomMap = false) {
+        startSoundTrack(2);
+        playerClassIndex = currentClassID;
+        playerType = a;
+        screenWidth = window.innerWidth;
+        screenHeight = window.innerHeight;
+        document.getElementById("startMenuWrapper").style.display = "none";
+        
+        if(isCustomMap && customMapData) {
+            // Bypass socket.emit and directly initialize the game
+            gameMap = {
+                genData: customMapData.genData,
+                width: customMapData.genData.width * mapTileScale,
+                height: customMapData.genData.height * mapTileScale,
+                tiles: [],
+                gameMode: { desc1: "Custom Map", desc2: "Custom Map" }
+            };
+            setupMap(gameMap);
+            gameStart = true;
+            updateGameLoop();
+        } else {
+            // Original code for normal rooms
+            room || socket.emit("create");
+        }
+        
+        // Hide UI and start game loop
+        socket.emit("respawn");
+        hideMenuUI();
+        animateOverlay = true;
+        updateGameLoop();
+    }
+
+    function validateMapData(mapData) {
+        if(!mapData || !mapData.genData) return false;
+        console.log("Custom map loaded locally!");
+        return true;
+    }
 
   function validNick() {
       return null !== /^\w*$/.exec(playerNameInput.value)
@@ -319,9 +350,9 @@ if (!self.__WB_pmw) {
       }), resize(), $("#loadingWrapper").fadeOut(200, function () {}))
   };
 
-  function openGooglePlay(a) {
+ /* function openGooglePlay(a) {
       window.open("https://web.archive.org/web/20211107033142/https://play.google.com/store/apps/details?id=tbs.vertix.io", a ? "_blank" : "_self")
-  }
+  }*/
   var accStatKills = document.getElementById("accStatKills"),
       accStatDeaths = document.getElementById("accStatDeaths"),
       accStatLikes = document.getElementById("accStatLikes"),
@@ -1414,12 +1445,13 @@ if (!self.__WB_pmw) {
   }
 
   function setupMap(a) {
+    a.pickups = [];
       var b = a.genData,
           d = -(2 * mapTileScale),
           e = -(2 * mapTileScale),
           f = 0,
           h = b.height,
-          g;
+          g; 
       a.tilePerCol = h;
       a.width = (b.width - 4) * mapTileScale;
       a.height = (b.height - 4) * mapTileScale;
@@ -2888,7 +2920,7 @@ if (!self.__WB_pmw) {
                   if ("" == a) return setModInfoText("Please enter a mod Key/URL"), !1;
                   loadingTexturePack =
                       doSounds = !0;
-                  isURL(a) ? (g = a, g.match(/^https?:\/\//i) || (g = "http://" + g)) : g = "https://web.archive.org/web/20211107033142/https://dl.dropboxusercontent.com/s/" + a + "/vertixmod.zip"
+                  isURL(a) ? (g = a, g.match(/^https?:\/\//i) || (g = "http://" + g)) : g = ""/*"https://web.archive.org/web/20211107033142/https://dl.dropboxusercontent.com/s/"*/ + a + "/vertixmod.zip"
               }
               b || setModInfoText("Loading...");
               zipFileCloser || (zipFileCloser = new d);
@@ -3553,5 +3585,23 @@ if (!self.__WB_pmw) {
   }
   callUpdate();
 
+  document.getElementById('mapFileInput').addEventListener('change', function(e) {
+    const file = e.target.files[0];
+    if (!file) return;
 
-}
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        try {
+            const mapData = JSON.parse(e.target.result);
+            if(validateMapData(mapData)) {
+                customMapData = mapData;
+                startGame(0, true); // Start with custom map flag
+            } else {
+                alert('Invalid map format');
+            }
+        } catch(err) {
+            alert('Error loading map: ' + err.message);
+        }
+    };
+    reader.readAsText(file);
+});

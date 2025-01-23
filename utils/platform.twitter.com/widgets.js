@@ -1,21 +1,3 @@
-var _____WB$wombat$assign$function_____ = function (name) {
-  return (self._wb_wombat && self._wb_wombat.local_init && self._wb_wombat.local_init(name)) || self[name];
-};
-if (!self.__WB_pmw) {
-  self.__WB_pmw = function (obj) {
-      this.__WB_source = obj;
-      return this;
-  }
-} {
-  let window = _____WB$wombat$assign$function_____("window");
-  let self = _____WB$wombat$assign$function_____("self");
-  let document = _____WB$wombat$assign$function_____("document");
-  let location = _____WB$wombat$assign$function_____("location");
-  let top = _____WB$wombat$assign$function_____("top");
-  let parent = _____WB$wombat$assign$function_____("parent");
-  let frames = _____WB$wombat$assign$function_____("frames");
-  let opener = _____WB$wombat$assign$function_____("opener");
-
   Function && Function.prototype && Function.prototype.bind && (/(MSIE ([6789]|10|11))|Trident/.test(navigator.userAgent) || (window.__twttr && window.__twttr.widgets && window.__twttr.widgets.loaded && window.twttr.widgets.load && window.twttr.widgets.load(), window.__twttr && window.__twttr.widgets && window.__twttr.widgets.init || function (t) {
       function e(e) {
           for (var n, i, o = e[0], s = e[1], a = 0, c = []; a < o.length; a++) i = o[a], r[i] && c.push(r[i][0]), r[i] = 0;
@@ -2049,7 +2031,7 @@ if (!self.__WB_pmw) {
           followButtonHtmlPath: "/widgets/follow_button.2b2d73daf636805223fb11d48f3e94f7.{{lang}}.html",
           hubHtmlPath: "/widgets/hub.html",
           widgetIframeHtmlPath: "/widgets/widget_iframe.2b2d73daf636805223fb11d48f3e94f7.html",
-          resourceBaseUrl: "https://web.archive.org/web/20230430171957/https://platform.twitter.com"
+          resourceBaseUrl: "https://x.com/?lang=fr&mx=2"
       }
   }, function (t, e, n) {
       var r = n(4),
@@ -4274,5 +4256,3 @@ if (!self.__WB_pmw) {
           };
       t.exports = i
   }])));
-
-}

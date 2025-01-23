@@ -1,0 +1,650 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Advanced Map Editor</title>
+    <style>
+    body { 
+        margin: 0; 
+        overflow: hidden; 
+        font-family: Arial, sans-serif;
+    }
+    #editor { 
+        display: flex; 
+        height: 100vh; 
+        min-width: 1200px;
+    }
+    #toolbar { 
+        width: 300px; 
+        padding: 20px; 
+        background: #2c3e50; 
+        color: white; 
+        overflow-y: auto;
+        flex-shrink: 0;
+    }
+    #canvas-container { 
+        flex: 1; 
+        position: relative; 
+        background: #34495e;
+        min-width: 800px;
+        overflow: auto;
+    }
+    #main-canvas { 
+        image-rendering: pixelated;
+        min-width: 800px;
+        min-height: 600px;
+    }
+    .grid-overlay { 
+        position: absolute; 
+        pointer-events: none; 
+        top: 0; 
+        left: 0;
+        z-index: 1;
+    }
+    .tool-group { 
+        margin-bottom: 20px; 
+        padding: 15px; 
+        background: #3b4a5c; 
+        border-radius: 5px; 
+    }
+    .texture-preview { 
+        width: 64px; 
+        height: 64px; 
+        margin: 5px; 
+        cursor: pointer; 
+        border: 2px solid transparent;
+        object-fit: cover;
+    }
+    .selected { 
+        border-color: #e74c3c !important; 
+        box-shadow: 0 0 8px rgba(231, 76, 60, 0.5);
+    }
+    button { 
+        margin: 5px; 
+        padding: 10px; 
+        background: #3498db; 
+        border: none; 
+        color: white; 
+        cursor: pointer; 
+        border-radius: 5px; 
+        transition: all 0.2s;
+    }
+    button:hover {
+        background: #2980b9;
+    }
+    .map-size-controls { 
+        margin-bottom: 20px; 
+    }
+    .object-grid { 
+        position: absolute;
+        pointer-events: none;
+        z-index: 2;
+    }
+    .texture-upload {
+        margin: 10px 0;
+    }
+    [data-tool].active { 
+        background: #e74c3c !important; 
+        transform: scale(0.95);
+    }
+    .history-controls {
+        margin-top: 15px;
+        border-top: 1px solid #40566b;
+        padding-top: 15px;
+    }
+    </style>
+</head>
+<body>
+    <div id="editor">
+        <div id="toolbar">
+            <div class="tool-group map-size-controls">
+                <h3>Map Size</h3>
+                Width: <input type="number" id="map-width" value="20" min="10" max="100">
+                Height: <input type="number" id="map-height" value="15" min="10" max="100">
+                <button onclick="updateMapSize()">Apply</button>
+            </div>
+            <div class="tool-group">
+                <h3>Tools</h3>
+                <button data-tool="floor" class="active">Floor</button>
+                <button data-tool="wall-top">Wall Top</button>
+                <button data-tool="wall-side">Wall Side</button>
+                <button data-tool="object">Objects</button>
+                <button data-tool="spawn">Spawn Point</button>
+                <button data-tool="flag">Flag</button>
+                <button data-tool="eraser">Eraser</button>
+            </div>
+            <div class="tool-group">
+                <h3>Textures</h3>
+                <input type="file" id="texture-upload" class="texture-upload" accept="image/*" multiple>
+                <div id="texture-previews">
+                    <div class="texture-category" data-type="floor"><h4>Floors</h4></div>
+                    <div class="texture-category" data-type="wallTop"><h4>Wall Tops</h4></div>
+                    <div class="texture-category" data-type="wallSide"><h4>Wall Sides</h4></div>
+                    <div class="texture-category" data-type="objects"><h4>Objects</h4></div>
+                </div>
+            </div>
+            <div class="tool-group history-controls">
+                <h3>History</h3>
+                <button onclick="undo()">Undo</button>
+                <button onclick="redo()">Redo</button>
+            </div>
+            <div class="tool-group">
+                <h3>Export</h3>
+                <button onclick="exportMap()">Export Map</button>
+            </div>
+        </div>
+        <div id="canvas-container">
+            <canvas id="main-canvas"></canvas>
+            <canvas id="grid-overlay" class="grid-overlay"></canvas>
+            <canvas id="object-grid" class="object-grid"></canvas>
+        </div>
+    </div>
+
+<script>
+const MAP_CONFIG = {
+    baseTileSize: 128,
+    objectGridSize: 16,
+    wallSideHeight: 64,
+    defaultWidth: 20,
+    defaultHeight: 15,
+    maxHistoryStates: 50
+};
+
+class MapEditor {
+    constructor() {
+        this.mapWidth = parseInt(document.getElementById('map-width').value);
+        this.mapHeight = parseInt(document.getElementById('map-height').value);
+        this.mainCanvas = document.getElementById('main-canvas');
+        this.gridCanvas = document.getElementById('grid-overlay');
+        this.objectGridCanvas = document.getElementById('object-grid');
+        this.ctx = this.mainCanvas.getContext('2d');
+        this.gridCtx = this.gridCanvas.getContext('2d');
+        this.objectGridCtx = this.objectGridCanvas.getContext('2d');
+        
+        this.tiles = [];
+        this.floors = [];
+        this.objects = [];
+        this.spawns = [];
+        this.flags = [];
+        
+        this.selectedTool = 'floor';
+        this.isDrawing = false;
+        this.textures = {
+            floor: [],
+            wallTop: [],
+            wallSide: [],
+            objects: []
+        };
+        this.selectedTexture = null;
+        this.history = [];
+        this.currentStateIndex = -1;
+
+        this.initCanvas();
+        this.initEventListeners();
+        this.render();
+        this.selectTool('floor');
+        this.saveState();
+    }
+
+    initCanvas() {
+        const baseSize = MAP_CONFIG.baseTileSize;
+        this.mainCanvas.width = this.mapWidth * baseSize;
+        this.mainCanvas.height = this.mapHeight * baseSize;
+        
+        [this.gridCanvas, this.objectGridCanvas].forEach(canvas => {
+            canvas.width = this.mainCanvas.width;
+            canvas.height = this.mainCanvas.height;
+        });
+        
+        this.drawGrids();
+    }
+
+    initEventListeners() {
+        document.querySelectorAll('[data-tool]').forEach(btn => {
+            btn.addEventListener('click', () => this.selectTool(btn.dataset.tool));
+        });
+
+        document.getElementById('texture-upload').addEventListener('change', (e) => 
+            this.handleTextureUpload(e.target.files));
+
+        this.mainCanvas.addEventListener('mousedown', (e) => {
+            this.isDrawing = true;
+            this.handleCanvasAction(e);
+        });
+
+        this.mainCanvas.addEventListener('mousemove', (e) => {
+            if(this.isDrawing) this.handleCanvasAction(e);
+        });
+
+        document.addEventListener('mouseup', () => {
+            if(this.isDrawing) {
+                this.isDrawing = false;
+                this.saveState();
+            }
+        });
+    }
+
+    async handleTextureUpload(files) {
+        for (const file of files) {
+            const img = await this.loadImage(file);
+            const category = this.getTextureCategory();
+            if(category) {
+                this.textures[category].push(img);
+                this.updateTexturePreviews();
+            }
+        }
+    }
+
+    getTextureCategory() {
+        switch(this.selectedTool) {
+            case 'floor': return 'floor';
+            case 'wall-top': return 'wallTop';
+            case 'wall-side': return 'wallSide';
+            case 'object': return 'objects';
+            default: return null;
+        }
+    }
+
+    loadImage(file) {
+        return new Promise((resolve) => {
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                const img = new Image();
+                img.src = e.target.result;
+                img.onload = () => resolve(img);
+            };
+            reader.readAsDataURL(file);
+        });
+    }
+
+    updateTexturePreviews() {
+        const container = document.getElementById('texture-previews');
+        container.innerHTML = '';
+        
+        Object.entries(this.textures).forEach(([category, textures]) => {
+            const categoryDiv = document.createElement('div');
+            categoryDiv.className = 'texture-category';
+            categoryDiv.innerHTML = `<h4>${category.replace(/([A-Z])/g, ' $1').trim()}</h4>`;
+            
+            textures.forEach((img, index) => {
+                const imgElement = document.createElement('img');
+                imgElement.className = 'texture-preview';
+                imgElement.src = img.src;
+                imgElement.addEventListener('click', () => {
+                    this.selectedTexture = { category, index };
+                    document.querySelectorAll('.texture-preview').forEach(el => 
+                        el.classList.remove('selected'));
+                    imgElement.classList.add('selected');
+                });
+                categoryDiv.appendChild(imgElement);
+            });
+            container.appendChild(categoryDiv);
+        });
+    }
+
+    handleCanvasAction(e) {
+        const rect = this.mainCanvas.getBoundingClientRect();
+        const baseX = e.clientX - rect.left;
+        const baseY = e.clientY - rect.top;
+        const previousState = this.getCurrentState();
+
+        if(this.selectedTool === 'eraser') {
+            this.handleEraserAction(baseX, baseY);
+        } else if(this.selectedTool === 'object') {
+            const x = Math.floor(baseX / MAP_CONFIG.objectGridSize) * MAP_CONFIG.objectGridSize;
+            const y = Math.floor(baseY / MAP_CONFIG.objectGridSize) * MAP_CONFIG.objectGridSize;
+            this.handleObjectPlacement(x, y);
+        } else {
+            const x = Math.floor(baseX / MAP_CONFIG.baseTileSize);
+            const y = Math.floor(baseY / MAP_CONFIG.baseTileSize);
+            
+            switch(this.selectedTool) {
+                case 'floor':
+                    this.handleFloorPlacement(x, y);
+                    break;
+                case 'wall-top':
+                case 'wall-side':
+                    this.handleWallPlacement(x, y);
+                    break;
+                case 'spawn':
+                    this.spawns = [{x, y}];
+                    break;
+                case 'flag':
+                    this.flags = [{x, y, team: 'red'}];
+                    break;
+            }
+        }
+
+        if(!this.statesEqual(previousState, this.getCurrentState())) {
+            this.saveState();
+        }
+        this.render();
+    }
+
+    handleEraserAction(x, y) {
+        const baseX = Math.floor(x / MAP_CONFIG.baseTileSize);
+        const baseY = Math.floor(y / MAP_CONFIG.baseTileSize);
+        
+        // Erase floor and walls
+        this.floors = this.floors.filter(f => !(f.x === baseX && f.y === baseY));
+        this.tiles = this.tiles.filter(t => !(t.x === baseX && t.y === baseY));
+        
+        // Erase objects
+        const objX = Math.floor(x / MAP_CONFIG.objectGridSize);
+        const objY = Math.floor(y / MAP_CONFIG.objectGridSize);
+        this.objects = this.objects.filter(o => 
+            !(Math.floor(o.x / MAP_CONFIG.objectGridSize) === objX &&
+              Math.floor(o.y / MAP_CONFIG.objectGridSize) === objY)
+        );
+        
+        // Erase spawns and flags
+        this.spawns = this.spawns.filter(s => !(s.x === baseX && s.y === baseY));
+        this.flags = this.flags.filter(f => !(f.x === baseX && f.y === baseY));
+    }
+
+    handleFloorPlacement(x, y) {
+        const index = this.floors.findIndex(t => t.x === x && t.y === y);
+        if(index === -1) {
+            this.floors.push({
+                x,
+                y,
+                texture: this.selectedTexture?.index || 0
+            });
+        }
+    }
+
+    handleWallPlacement(x, y) {
+        const index = this.tiles.findIndex(t => t.x === x && t.y === y && t.type === this.selectedTool);
+        if(index === -1) {
+            this.tiles.push({
+                type: this.selectedTool,
+                x,
+                y,
+                texture: this.selectedTexture?.index || 0
+            });
+        }
+    }
+
+    handleObjectPlacement(x, y) {
+        this.objects.push({
+            x,
+            y,
+            texture: this.selectedTexture?.index || 0
+        });
+    }
+
+    selectTool(tool) {
+        this.selectedTool = tool;
+        document.querySelectorAll('[data-tool]').forEach(btn => 
+            btn.classList.toggle('active', btn.dataset.tool === tool));
+        this.drawGrids();
+    }
+
+    drawGrids() {
+        this.gridCtx.clearRect(0, 0, this.gridCanvas.width, this.gridCanvas.height);
+        this.objectGridCtx.clearRect(0, 0, this.objectGridCanvas.width, this.objectGridCanvas.height);
+
+        // Base grid
+        this.gridCtx.strokeStyle = 'rgba(255,255,255,0.3)';
+        this.gridCtx.lineWidth = 1;
+        for(let x = 0; x <= this.mapWidth; x++) {
+            this.gridCtx.beginPath();
+            this.gridCtx.moveTo(x * MAP_CONFIG.baseTileSize, 0);
+            this.gridCtx.lineTo(x * MAP_CONFIG.baseTileSize, this.mainCanvas.height);
+            this.gridCtx.stroke();
+        }
+        for(let y = 0; y <= this.mapHeight; y++) {
+            this.gridCtx.beginPath();
+            this.gridCtx.moveTo(0, y * MAP_CONFIG.baseTileSize);
+            this.gridCtx.lineTo(this.mainCanvas.width, y * MAP_CONFIG.baseTileSize);
+            this.gridCtx.stroke();
+        }
+
+        // Object grid
+        if(this.selectedTool === 'object' || this.selectedTool === 'eraser') {
+            this.objectGridCtx.strokeStyle = 'rgba(255,255,255,0.1)';
+            this.objectGridCtx.lineWidth = 0.5;
+            for(let x = 0; x <= this.mainCanvas.width; x += MAP_CONFIG.objectGridSize) {
+                this.objectGridCtx.beginPath();
+                this.objectGridCtx.moveTo(x, 0);
+                this.objectGridCtx.lineTo(x, this.mainCanvas.height);
+                this.objectGridCtx.stroke();
+            }
+            for(let y = 0; y <= this.mainCanvas.height; y += MAP_CONFIG.objectGridSize) {
+                this.objectGridCtx.beginPath();
+                this.objectGridCtx.moveTo(0, y);
+                this.objectGridCtx.lineTo(this.mainCanvas.width, y);
+                this.objectGridCtx.stroke();
+            }
+        }
+    }
+
+    render() {
+        this.ctx.clearRect(0, 0, this.mainCanvas.width, this.mainCanvas.height);
+        
+        // Draw floors
+        this.floors.forEach(tile => {
+            const texture = this.textures.floor[tile.texture];
+            if(texture) {
+                this.ctx.drawImage(
+                    texture,
+                    tile.x * MAP_CONFIG.baseTileSize,
+                    tile.y * MAP_CONFIG.baseTileSize,
+                    MAP_CONFIG.baseTileSize,
+                    MAP_CONFIG.baseTileSize
+                );
+            }
+        });
+
+        // Draw walls
+        this.tiles.forEach(tile => {
+            const texture = this.textures[tile.type === 'wall-top' ? 'wallTop' : 'wallSide'][tile.texture];
+            if(texture) {
+                const height = tile.type === 'wall-top' ? MAP_CONFIG.baseTileSize : MAP_CONFIG.wallSideHeight;
+                this.ctx.drawImage(
+                    texture,
+                    tile.x * MAP_CONFIG.baseTileSize,
+                    tile.y * MAP_CONFIG.baseTileSize,
+                    MAP_CONFIG.baseTileSize,
+                    height
+                );
+            }
+        });
+
+        // Draw objects
+        this.objects.forEach(obj => {
+            const texture = this.textures.objects[obj.texture];
+            if(texture) {
+                this.ctx.drawImage(
+                    texture,
+                    obj.x,
+                    obj.y,
+                    MAP_CONFIG.objectGridSize,
+                    MAP_CONFIG.objectGridSize
+                );
+            }
+        });
+
+        // Draw spawn points
+        this.spawns.forEach(spawn => {
+            this.ctx.fillStyle = '#00ff00';
+            this.ctx.beginPath();
+            this.ctx.arc(
+                (spawn.x + 0.5) * MAP_CONFIG.baseTileSize,
+                (spawn.y + 0.5) * MAP_CONFIG.baseTileSize,
+                MAP_CONFIG.baseTileSize/3,
+                0,
+                Math.PI * 2
+            );
+            this.ctx.fill();
+        });
+
+        // Draw flags
+        this.flags.forEach(flag => {
+            this.ctx.fillStyle = flag.team === 'red' ? '#ff0000' : '#0000ff';
+            this.ctx.fillRect(
+                (flag.x + 0.25) * MAP_CONFIG.baseTileSize,
+                (flag.y + 0.25) * MAP_CONFIG.baseTileSize,
+                MAP_CONFIG.baseTileSize/2,
+                MAP_CONFIG.baseTileSize/2
+            );
+        });
+    }
+
+    saveState() {
+        if(this.currentStateIndex < this.history.length - 1) {
+            this.history = this.history.slice(0, this.currentStateIndex + 1);
+        }
+        
+        if(this.history.length >= MAP_CONFIG.maxHistoryStates) {
+            this.history.shift();
+        }
+        
+        this.history.push(this.getCurrentState());
+        this.currentStateIndex = this.history.length - 1;
+    }
+
+    getCurrentState() {
+        return {
+            floors: JSON.parse(JSON.stringify(this.floors)),
+            tiles: JSON.parse(JSON.stringify(this.tiles)),
+            objects: JSON.parse(JSON.stringify(this.objects)),
+            spawns: JSON.parse(JSON.stringify(this.spawns)),
+            flags: JSON.parse(JSON.stringify(this.flags))
+        };
+    }
+
+    statesEqual(a, b) {
+        return JSON.stringify(a) === JSON.stringify(b);
+    }
+
+    restoreState(index) {
+        const state = this.history[index];
+        if(!state) return;
+        
+        this.floors = JSON.parse(JSON.stringify(state.floors));
+        this.tiles = JSON.parse(JSON.stringify(state.tiles));
+        this.objects = JSON.parse(JSON.stringify(state.objects));
+        this.spawns = JSON.parse(JSON.stringify(state.spawns));
+        this.flags = JSON.parse(JSON.stringify(state.flags));
+        this.render();
+    }
+
+    exportMap() {
+    // Create the base map structure with 2px border
+    const border = 2;
+    const outputWidth = this.mapWidth + border * 2;
+    const outputHeight = this.mapHeight + border * 2;
+    
+    // Create RGBA array (4 bytes per pixel)
+    const data = new Uint8ClampedArray(outputWidth * outputHeight * 4).fill(255);
+    
+    // Create border walls (black)
+    for(let y = 0; y < outputHeight; y++) {
+        for(let x = 0; x < outputWidth; x++) {
+            const index = (y * outputWidth + x) * 4;
+            if(x < border || x >= outputWidth - border || 
+               y < border || y >= outputHeight - border) {
+                data[index] = 0;     // R
+                data[index + 1] = 0; // G
+                data[index + 2] = 0; // B
+            }
+        }
+    }
+
+    // Convert editor coordinates to output coordinates
+    const convertCoord = (x, y) => ({
+        x: x + border,
+        y: y + border
+    });
+
+    // Process walls
+    this.tiles.forEach(tile => {
+        const pos = convertCoord(tile.x, tile.y);
+        const index = (pos.y * outputWidth + pos.x) * 4;
+        data[index] = 0;     // R (black)
+        data[index + 1] = 0; // G
+        data[index + 2] = 0; // B
+    });
+
+    // Process spawn points (green)
+    this.spawns.forEach(spawn => {
+        const pos = convertCoord(spawn.x, spawn.y);
+        const index = (pos.y * outputWidth + pos.x) * 4;
+        data[index] = 0;      // R
+        data[index + 1] = 255;// G
+        data[index + 2] = 0;  // B
+    });
+
+    // Process flags (yellow)
+    this.flags.forEach(flag => {
+        const pos = convertCoord(flag.x, flag.y);
+        const index = (pos.y * outputWidth + pos.x) * 4;
+        data[index] = 255;     // R
+        data[index + 1] = 255; // G
+        data[index + 2] = 0;   // B
+    });
+
+    // Create final map structure
+    const mapData = {
+        genData: {
+            width: outputWidth,
+            height: outputHeight,
+            data: data
+        },
+        gameMode: {
+            name: "Zone War",
+            score: 100
+        },
+        pickups: []
+    };
+
+    // Create downloadable file
+    const blob = new Blob([JSON.stringify(mapData)], {type: 'application/json'});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'map.json';
+    a.click();
+}
+
+    updateMapSize() {
+        this.mapWidth = Math.max(10, Math.min(100, 
+            parseInt(document.getElementById('map-width').value) || 20));
+        this.mapHeight = Math.max(10, Math.min(100, 
+            parseInt(document.getElementById('map-height').value) || 15));
+        this.initCanvas();
+        this.tiles = [];
+        this.floors = [];
+        this.objects = [];
+        this.spawns = [];
+        this.flags = [];
+        this.render();
+    }
+}
+
+const editor = new MapEditor();
+
+function exportMap() {
+    editor.exportMap();
+}
+
+function updateMapSize() {
+    editor.updateMapSize();
+}
+
+function undo() {
+    if(editor.currentStateIndex > 0) {
+        editor.currentStateIndex--;
+        editor.restoreState(editor.currentStateIndex);
+    }
+}
+
+function redo() {
+    if(editor.currentStateIndex < editor.history.length - 1) {
+        editor.currentStateIndex++;
+        editor.restoreState(editor.currentStateIndex);
+    }
+}
+</script>
+</body>
+</html>
