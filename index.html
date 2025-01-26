@@ -410,7 +410,7 @@
 			<div id="modTab" class="tabcontent">
 				<h3 class="menuHeaderTabbed2">LOAD MOD PACK</h3>
 				<div id="featuredModList">
-
+					<div class="modBtn" onclick="loadModPack('wzgisghnvj0dohtzk6s1f', false)">Minimalist Mod</div>
 				</div>
 				<div>
 					<input type="text" tabindex="0" autofocus placeholder="Mod Key/URL" id="textureModInput" class="menuTextInput"/>
@@ -425,12 +425,6 @@
 	</div>
 	<div id="linkBox" class="linkBox">
 		<center>
-			<div onclick="clickDropUpLink(1)" class="dropUpLink">MODS
-				<ul id="di1" class="dropdown">
-    				<li><a target="_blank" href="">FIND A MOD</a></li>
-   					<li><a target="_blank" href="">MAKE A MOD</a></li>
- 		 		</ul>
-			</div> |
 			<div onclick="clickDropUpLink(2)" class="dropUpLink">COMMUNITY
 				<ul id="di2" class="dropdown">
     				<li><a target="_blank" href="#">FORUM</a></li>
@@ -462,7 +456,7 @@
 			<div onclick="clickDropUpLink(5)" class="dropUpLink">SHARE
 				<ul id="di5" class="dropdown">
 					<li><a target="_blank" href="https://discord.gg/hAw42YXYWT">DISCORD</a></li>
-   					<li><a target="_blank" href="">TWITTER</a></li>
+   					<li><a target="_blank" href="https://bsky.app/profile/vertixgame.bsky.social">BLUESKY</a></li>
 				</ul>
 			</div>
 		</center>
@@ -492,12 +486,12 @@
 	</script>
 	<script src="./js/socket.io.min.js"></script>
 	<script src="./js/app.js"></script>
-	<script>
+	<!--<script>
 		twttr.ready(function (twttr) {
 		    twttr.events.bind('follow', function(event) {
 		        unlockSecret(0);
 		    });
 		});
-	</script>
+	</script>-->
 </body>
 </html>

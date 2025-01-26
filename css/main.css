@@ -2,7 +2,7 @@
 @font-face {
 	font-family: 'mainFont';
 	font-size: 8px;
-	src: url("./fonts/font2.ttf");
+	src: url("./fonts/font.ttf");
 }
 
 html, body {
@@ -85,7 +85,7 @@ select {
 }
 
 canvas {
-	cursor: url("./images/cursor_aim.png") 17 17, default;
+	cursor: url("/images/cursor_aim.png") 17 17, default;
 	width: 100% !important;
 	height: 100% !important;
 	margin: 0;

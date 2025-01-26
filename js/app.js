@@ -24,7 +24,7 @@
       timeSinceLastUpdate = 0,
       timeOfLastUpdate = 0,
       port, region;
-  zip.workerScriptsPath = "./js/lib/";
+      zip.workerScriptsPath = "./js/lib/";
   /Android|webOS|iPhone|iPad|iPod|BlackBerry/i.test(navigator.userAgent) && (mobile = !0, hideMenuUI(), hideUI(!0), openGooglePlay(!1));
   Number.prototype.round = function (a) {
       return +this.toFixed(a)
@@ -66,6 +66,7 @@
     }
     
     function enterGame(a, isCustomMap = false) {
+        
         startSoundTrack(2);
         playerClassIndex = currentClassID;
         playerType = a;
@@ -350,6 +351,8 @@
       }), resize(), $("#loadingWrapper").fadeOut(200, function () {}))
   };
 
+
+  
  /* function openGooglePlay(a) {
       window.open("https://web.archive.org/web/20211107033142/https://play.google.com/store/apps/details?id=tbs.vertix.io", a ? "_blank" : "_self")
   }*/
@@ -2920,7 +2923,7 @@
                   if ("" == a) return setModInfoText("Please enter a mod Key/URL"), !1;
                   loadingTexturePack =
                       doSounds = !0;
-                  isURL(a) ? (g = a, g.match(/^https?:\/\//i) || (g = "http://" + g)) : g = ""/*"https://web.archive.org/web/20211107033142/https://dl.dropboxusercontent.com/s/"*/ + a + "/vertixmod.zip"
+                  isURL(a) ? (g = a, g.match(/^https?:\/\//i) || (g = "http://" + g)) : g = "https://www.dropbox.com/scl/fi/" + a + "/vertixmod.zip"
               }
               b || setModInfoText("Loading...");
               zipFileCloser || (zipFileCloser = new d);
