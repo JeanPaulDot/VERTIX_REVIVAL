@@ -6,42 +6,6 @@ Vertix.io is a beloved multiplayer 2D shooter that captured the hearts of player
 ## Our Goal
 The goal of the Vertix.io Revival Project is to bring the game back to life and make it accessible across multiple platforms, ensuring that both old and new players can enjoy the classic experience once again. We aim to modernize the backend infrastructure while preserving the core gameplay mechanics that made Vertix.io so special.
 
-<<<<<<< HEAD
-Here's the new section to add under **Phase 3: Public Release**:
-
-### Map Editor  
-To empower players and foster creativity, we’ve developed an **advanced in-browser map editor** that allows anyone to design custom maps for Vertix.io. This tool bridges the gap between players and creators, ensuring the game’s content evolves with community input.  
-
-#### Key Features:  
-- **Tile-Based Design**:  
-  - Create maps using modular tiles (128x128px base grid) with support for **walls**, **floors**, **spawn points**, and **objective markers**.  
-  - Dedicated 16x16px grid for precise object placement (barrels, crates, etc.).  
-- **Texture System**:  
-  - Import custom textures for walls, floors, and objects.  
-  - Categorize assets by type (wall tops, sides, floors, etc.).  
-- **Real-Time Preview**:  
-  - Toggle grid overlays and test map layouts instantly.  
-  - Pixel-perfect rendering ensures WYSIWYG results.  
-- **Export/Import**:  
-  - Export maps as `.json` files compatible with Vertix.io’s engine.  
-  - Share creations directly or load them into private servers.  
-- **Undo/Redo & Eraser**:  
-  - Robust history system with 50-state undo/redo.  
-  - Multi-tool eraser for quick edits.  
-
-#### How It Works:  
-1. Design maps using intuitive tools (walls, spawn zones, flags).  
-2. Test layouts with real-time collision and spawn visualization.  
-3. Export maps with one click. The editor automatically:  
-   - Adds a 2px border (required by Vertix.io’s engine).  
-   - Encodes walls as `RGB(0,0,0)`, spawns as `RGB(0,255,0)`, and flags as `RGB(255,255,0)`.  
-   - Generates collision data and neighbor detection for walls.  
-4. Load maps into custom servers or submit them for inclusion in official rotations.  
-
-This tool will ship with the **open-source release**, allowing modders to expand its functionality or integrate new asset packs. Community maps will be featured in seasonal events and ranked playlists, ensuring fresh content driven by players!
-
-=======
->>>>>>> origin/main
 ## Roadmap
 
 ### Phase 1: Foundation
@@ -84,9 +48,4 @@ This tool will ship with the **open-source release**, allowing modders to expand
 ## How You Can Help
 We are actively seeking contributors, testers, and passionate fans to help make this revival a success. If you're interested in contributing, please reach out through our community channels.
 
-<<<<<<< HEAD
 Together, we can bring Vertix.io back and make it better than ever!
-=======
-Together, we can bring Vertix.io back and make it better than ever!
-
->>>>>>> origin/main
