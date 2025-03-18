@@ -1,6 +1,5 @@
 # Vertix.io Revival
 
-## About Vertix.io
 Vertix.io is a beloved multiplayer 2D shooter that captured the hearts of players with its fast-paced action, unique art style, and competitive gameplay. Initially launched as a browser-based game, Vertix.io provided an accessible and fun experience for casual and hardcore gamers alike. Unfortunately, the game was discontinued, leaving many fans eager to see its return.
 
 ## Our Goal
@@ -47,5 +46,14 @@ The goal of the Vertix.io Revival Project is to bring the game back to life and 
 
 ## How You Can Help
 We are actively seeking contributors, testers, and passionate fans to help make this revival a success. If you're interested in contributing, please reach out through our community channels.
+
+## On archives and accessibility to digital heritage
+- [Exemption to PCCPSACT](https://www.federalregister.gov/documents/2018/10/26/2018-23241/exemption-to-prohibition-on-circumvention-of-copyright-protection-systems-for-access-control), exemptions to the provision of the Digital Millennium Copyright Act (“DMCA”). 
+- [EFGAMP](https://efgamp.eu/), the European Federation of Video Game Archives, Museums and Preservation projects.
+- [UNESCO PERSIST Programme](https://unescopersist.org/), helps ensure that digital information can continue to be accessed in the future.
+- [The Internet Archive](https://archive.org/), a digital library of Internet sites and other cultural artifacts in digital form.
+- [Adobe Flash Player Archive](https://archive.org/download/flashplayerarchive/), the Adobe Inc. archive.org Flash Player Archive.
+
+---
 
 Together, we can bring Vertix.io back and make it better than ever!
